@@ -1,150 +1,73 @@
-### Imports ##################################################
 import json
-import os  # per neteja la pantalla
+import os
+from typing import Union
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-# Variables ###################################################
 
-# Nom del fitxer on desar/carregar dades
+app = FastAPI()
+
+# Nom del fitxer on desarem/carregarem dades
 dicAlumnes = "alumnes.json"
 
-
-### menu() ###################################################
-#   Aquesta funció mostra el menú d'opcions per pantalla.
-
+# Inicialitzem la llista d'alumnes
 alumnat = []
 
-#   Retorna (str): l'opció escollida per l'usuari
-##############################################################
-def menu():
-    # Netejem la pantalla
-    os.system('cls')
-
-    # Mostrem les diferents opcions
-    print("Gestió alumnes")
-    print("-------------------------------")
-    print("1. Mostrar alumnes")
-    print("2. Afegir alumne")
-    print("3. Veure alumne")
-    print("4. Esborrar alumne")
-
-    print("\n5. Desar a fitxer")
-    print("6. Llegir fitxer")
-
-    print("\n0. Sortir\n\n\n")
-    print(">", end=" ")
-
-    # i retornem l'opció escollida per l'usuari
-    return input()
+# Modelo base para el ADD
+class Alumne(BaseModel):
+ nom: str
+ cognom: str
+ dia: int
+ mes: int
+ any: int
+ email: str
+ feina: str
+ curs: int
 
 
-### Programa ################################################
+# Carreguem les dades si el fitxer existeix
+if os.path.exists(dicAlumnes):
+    with open(dicAlumnes, "r") as f:
+        alumnat = json.load(f)
 
-# Fins a l'infinit (i més enllà)
-while True:
+# Mostrar el texto Institut TIC de Barcelona
+@app.get("/")
+def index():
+    return "Institut TIC de Barcelona"
 
-    # Executem una opció funció del que hagi escollit l'usuari
-    match menu():
+# Mostrar el numero de alumnos totales
+@app.get("/alumnes/")
+def get_total_alumnes():
+    return {"total": len(alumnat)}
 
-        # Mostrar alumnes ##################################
-        case "1":
-            os.system('cls')
-            print("Mostrar alumnes")
-            print("-------------------------------")
+# Muestra la informacion de un Alumno en concreto usando el ID como referencia
+@app.get("/id/{numero}")
+def get_alumne(numero: int):
+    for alumne in alumnat:
+        if alumne["id"] == numero:
+            return alumne
+    return {"error": f"No s'ha trobat cap alumne amb ID {numero}"} # Mensaje de error
 
-            # Introduiu el vostre codi per mostrar alumnes aquí
 
+@app.delete("/del/{numero}")
+def delete_alumne(numero: int):
+    global alumnat
+    for i, alumne in enumerate(alumnat): # recorre la lista
+        if alumne["id"] == numero: # si ID coincide con el numero proporcionado
+            del alumnat[i] # elimina el alumno asociado al ID del mismo numero proporcionado
+            with open(dicAlumnes, "w") as f:  # abre el archivo en mode escritura y guarda el contenido de forma estructurada
+                json.dump(alumnat, f, indent=4)
+            return {"missatge": "Alumne eliminat correctament"} # mensaje de confirmacion
+    return {"error": f"No s'ha trobat cap alumne amb ID {numero}"}  # Mensaje de error
 
-            print("[",Alumne1["id"],"]",Alumne1["nom"],Alumne["cognom"])
-
-            input()
-
-        # Afegir alumne ##################################
-        case "2":
-            os.system('cls')
-            print("Afegir alumne")
-            print("-------------------------------")
-
-            # Introduiu el vostre codi per afegir un alumne aquí
-            id_alumno = len(alumnat) + 1
-            nom = input("Nom: ")
-            cognom = input("Cognom: ")
-            dia = int(input("Dia de la data: "))
-            mes = int(input("Mes de la data: "))
-            any = int(input("Any de la data: "))
-            email = input("Email: ")
-            feina = input("Feina (sí/no): ").lower() == "sí"
-            curs = input("Curs: ")
-
-            alumneInsert = {
-                "id": id_alumno,
-                "nom": nom,
-                "cognom": cognom,
-                "data": {
-                    "dia": dia,
-                    "mes": mes,
-                    "any": any
-                },
-                "email": email,
-                "feina": feina,
-                "curs": curs
-            }
-            alumnat.append(alumneInsert)
-            dicAlumnes = open("alumnes.py", "wt")
-            json.dump(alumneInsert, dicAlumnes)
-            dicAlumnes.close()
-            alumnat[id_alumno] = alumneInsert
-
-            input()
-
-        # Veure alumne ##################################
-        case "3":
-            os.system('cls')
-            print("Veure alumne")
-            print("-------------------------------")
-
-            # Introduiu el vostre codi per veure un alumne aquí
-
-            input()
-
-        # Esborrar alumne ##################################
-        case "4":
-            os.system('cls')
-            print("Esborrar alumne")
-            print("-------------------------------")
-
-            # Introduiu el vostre codi per esborrar un alumne aquí
-
-            input()
-
-        # Desar a fitxer ##################################
-        case "5":
-            os.system('cls')
-            print("Desar a fitxer")
-            print("-------------------------------")
-
-            # Introduiu el vostre codi per desar a fitxer aquí
-
-            input()
-
-        # Llegir fitxer ##################################
-        case "6":
-            os.system('cls')
-            print("Llegir fitxer")
-            print("-------------------------------")
-
-            # Introduiu el vostre codi per llegir de fitxer aquí
-
-            input()
-
-        # Sortir ##################################
-        case "0":
-            os.system('cls')
-            print("Adeu!")
-
-            # Trenquem el bucle infinit
-            break
-
-        # Qualsevol altra cosa #####################
-        case _:
-            print("\nOpció incorrecta\a")
-            input()
+#
+@app.post("/alumne/")
+def post_alumne(alumne: Alumne):
+    nou_id = max([a["id"] for a in alumnat], default=0) + 1
+    alumne_dict = alumne.dict()
+    alumne_dict["id"] = nou_id
+    alumne_dict = {"id": alumne_dict["id"], **alumne_dict}    # Mover el ID al principio del diccionario
+    alumnat.insert(0, alumne_dict)    # Añadir el alumno al principio de la lista
+    with open(dicAlumnes, "w") as f:    # Guardar los alumnes en el archivo
+        json.dump(alumnat, f, indent=4)
+    return {"missatge": "Alumne afegit correctament", "id": nou_id}    # mostrar un texto

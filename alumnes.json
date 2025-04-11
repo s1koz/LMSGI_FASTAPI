@@ -1,0 +1,59 @@
+[
+    {
+        "id": 6,
+        "nom": "test5",
+        "cognom": "test5",
+        "dia": 5,
+        "mes": 5,
+        "any": 2005,
+        "email": "test5@gmail.com",
+        "feina": "no",
+        "curs": 2
+    },
+    {
+        "id": 4,
+        "nom": "test4",
+        "cognom": "test4",
+        "dia": 4,
+        "mes": 4,
+        "any": 2004,
+        "email": "test4@gmail.com",
+        "feina": "no",
+        "curs": 1
+    },
+    {
+        "id": 3,
+        "nom": "test3",
+        "cognom": "test3",
+        "dia": 3,
+        "mes": 3,
+        "any": 1003,
+        "email": "test3@gmail.com",
+        "feina": "si",
+        "curs": 1
+    },
+    {
+        "id": 1,
+        "nom": "ko",
+        "cognom": "ko",
+        "data": {
+            "dia": 2,
+            "mes": 2,
+            "any": 23
+        },
+        "email": "ko@gmail.com",
+        "feina": false,
+        "curs": "1"
+    },
+    {
+        "id": 2,
+        "nom": "izan",
+        "cognom": "mediel",
+        "dia": 10,
+        "mes": 12,
+        "any": 2003,
+        "email": "test1@gmail.com",
+        "feina": "no",
+        "curs": 2
+    }
+]

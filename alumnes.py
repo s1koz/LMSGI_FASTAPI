@@ -1,1 +1,0 @@
-[{"id": 1, "nom": "chali", "cognom": "chen", "data": {"dia": 2, "mes": 3, "any": 4}, "email": "test@gmail.com", "feina": false, "curs": "25"}]
